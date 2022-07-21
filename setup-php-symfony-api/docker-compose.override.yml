@@ -1,0 +1,40 @@
+version: "3.4"
+
+# Development environment override
+services:
+  php:
+    volumes:
+      - ./:/srv/app
+      - ./docker/php/conf.d/symfony.dev.ini:/usr/local/etc/php/conf.d/symfony.ini
+      # If you develop on Mac you can remove the var/ directory from the bind-mount
+      # for better performance by enabling the next line
+      # - /srv/app/var
+    environment:
+      APP_ENV: dev
+
+  db:
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=database
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    volumes:
+      - volumes-db:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+  caddy:
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./public:/srv/app/public:ro
+
+volumes:
+  volumes-db: {}
